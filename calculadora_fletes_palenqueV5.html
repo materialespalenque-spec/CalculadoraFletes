@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Materiales Palenque — Calculadora de Fletes</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#F3F4F6;color:#111827;min-height:100vh}
+input,select,button,textarea{font-family:inherit;font-size:inherit}
+.wrap{max-width:740px;margin:0 auto;padding:0 12px 52px}
+
+/* HEADER */
+.hd{background:#1C2834;color:#fff;padding:0 12px;position:sticky;top:0;z-index:200}
+.hd-top{max-width:740px;margin:0 auto;padding:12px 0 0;display:flex;align-items:baseline;gap:10px}
+.hd-brand{font-size:11px;text-transform:uppercase;letter-spacing:.1em;opacity:.5}
+.hd-title{font-size:19px;font-weight:800}
+.nav{max-width:740px;margin:0 auto;display:flex;overflow-x:auto}
+.nb{padding:10px 16px;font-size:13px;font-weight:700;background:transparent;border:none;color:rgba(255,255,255,.5);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:.15s}
+.nb.on{color:#fff;border-bottom-color:#3B82F6}
+
+/* TABS */
+.tab{display:none;padding-top:14px}
+.tab.on{display:block}
+
+/* CARDS */
+.card{background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:16px 18px;margin-bottom:12px}
+.ct{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9CA3AF;display:block;margin-bottom:10px}
+
+/* VEHICLE GRID */
+.vg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.vb{background:#F9FAFB;border:1.5px solid #E5E7EB;border-radius:12px;padding:11px 7px;cursor:pointer;text-align:center;transition:.15s;width:100%}
+.vb-ico{font-size:24px;display:block;margin-bottom:4px}
+.vb-nm{font-size:12px;font-weight:700;display:block}
+.vb-mx{font-size:10px;color:#9CA3AF;display:block;margin-top:2px}
+.vb-ds{font-size:10px;color:#9CA3AF;display:block;margin-top:2px;line-height:1.3}
+
+/* FORMS */
+.fl{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:5px}
+.fi{width:100%;padding:9px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;color:#111827;background:#fff;transition:.15s}
+.fi:focus{outline:none;border-color:#3B82F6}
+.fg{margin-bottom:12px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:.15s}
+.bp{background:#1C2834;color:#fff}.bp:hover{background:#374151}
+.bs{background:#059669;color:#fff}
+.bd{background:#DC2626;color:#fff}
+.bo{background:#fff;border:1.5px solid #E5E7EB;color:#374151}.bo:hover{background:#F9FAFB}
+.bsm{padding:5px 12px;font-size:12px}
+.bgrp{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+
+/* CALCULATOR */
+.km-r{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.km-in{font-size:28px;font-weight:800;width:90px;border:none;background:transparent;color:#111827}
+.km-nfo{font-size:12px;color:#9CA3AF;line-height:1.9;text-align:right;flex:1}
+
+/* SICAR BOX */
+.sb{background:#EFF6FF;border:2px solid #3B82F6;border-radius:12px;padding:16px;margin-bottom:12px}
+.sb-ttl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#1D4ED8;display:block;margin-bottom:6px}
+.sb-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px}
+.sb-in{font-size:22px;font-weight:800;width:160px;padding:7px 12px;border:2px solid #3B82F6;border-radius:8px}
+
+/* ADD ROW */
+.ar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.ar select{flex:2;min-width:150px}
+.ar input{width:78px;text-align:center;font-weight:700}
+
+/* CART */
+.cr{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #F3F4F6}
+.cr:last-child{border-bottom:none}
+.ci{flex:1}
+.cn{font-size:13px;color:#111827}
+.cs{font-size:11px;color:#9CA3AF}
+.cq{width:70px;font-size:14px;font-weight:700;text-align:center;padding:4px 6px;border-radius:7px;border:1.5px solid #E5E7EB}
+.cv{font-size:13px;font-weight:700;color:#111827;min-width:70px;text-align:right}
+.xb{background:none;border:none;cursor:pointer;font-size:20px;color:#D1D5DB;padding:0 3px;line-height:1}
+.xb:hover{color:#DC2626}
+
+/* CAPACITY BAR */
+.cpw{margin-top:12px}
+.cpl{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.cpb{height:10px;background:#F3F4F6;border-radius:5px;overflow:hidden}
+.cpf{height:100%;border-radius:5px;transition:width .4s}
+.cpm{display:flex;justify-content:space-between;font-size:10px;color:#9CA3AF;margin-top:4px}
+
+/* RESULTS */
+.bg2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.bc{border-radius:12px;padding:14px 16px;text-align:center}
+.bl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.bv{font-size:32px;font-weight:900;letter-spacing:-1px}
+.bn{font-size:11px;margin-top:2px;opacity:.7}
+.dr{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid #F3F4F6}
+.dr:last-child{border-bottom:none}
+.dt{font-weight:700}
+.dg{color:#059669;font-weight:700}
+.ch3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.cc{border-radius:10px;padding:10px 8px;text-align:center}
+.ci2{font-size:22px;margin-bottom:2px}
+.cl2{font-size:11px;font-weight:700}
+.cd{font-size:11px;margin-top:2px}
+.dec{border-radius:12px;padding:12px 16px;margin-bottom:10px;font-size:13px;font-weight:600}
+
+/* PRODUCT TABLE */
+.fb{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.fc{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #E5E7EB;background:#fff;color:#9CA3AF;transition:.15s}
+.fc.on{background:#1C2834;color:#fff;border-color:#1C2834}
+.pt{width:100%;border-collapse:collapse;font-size:13px}
+.pt th{text-align:left;padding:8px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#9CA3AF;border-bottom:2px solid #F3F4F6;background:#FAFAFA}
+.pt td{padding:9px 10px;border-bottom:1px solid #F3F4F6;color:#111827}
+.pt tr:hover td{background:#F9FAFB}
+.cbg{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;background:#F3F4F6;color:#6B7280}
+
+/* VEHICLE MANAGEMENT */
+.vm{display:grid;gap:10px}
+.vc{background:#fff;border:1.5px solid #E5E7EB;border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px}
+.vi{font-size:32px;flex-shrink:0}
+.vn2{font-size:15px;font-weight:700;margin-bottom:3px}
+.vs{font-size:12px;color:#6B7280;line-height:1.9}
+.va{display:flex;gap:6px;flex-shrink:0}
+
+/* MODAL */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:500;padding:12px}
+.mb{background:#fff;border-radius:14px;width:100%;max-width:490px;max-height:92vh;overflow-y:auto;padding:22px 24px;box-shadow:0 20px 48px rgba(0,0,0,.25)}
+.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.mt{font-size:17px;font-weight:800}
+.mx{font-size:24px;background:none;border:none;cursor:pointer;color:#9CA3AF;line-height:1;padding:0}
+
+/* CONFIG */
+.cs2{margin-bottom:16px}
+.cs2-t{font-size:13px;font-weight:700;color:#374151;margin-bottom:10px;padding-bottom:6px;border-bottom:1.5px solid #F3F4F6;display:block}
+.code{background:#1C2834;color:#E5E7EB;border-radius:10px;padding:14px 16px;font-family:monospace;font-size:11px;line-height:1.7;overflow-x:auto;margin-top:10px;white-space:pre-wrap;word-break:break-all}
+
+/* UTILS */
+.mu{color:#9CA3AF}
+.msm{font-size:12px}
+.sep{border:none;border-top:1px solid #F3F4F6;margin:14px 0}
+.empty{text-align:center;padding:24px;color:#9CA3AF;font-size:14px}
+.tr-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.stat{padding:8px 12px;border-radius:8px;font-size:13px;margin-top:8px}
+.tgl{display:flex;border-radius:8px;overflow:hidden;border:1.5px solid #E5E7EB;width:fit-content;margin-bottom:12px}
+.tgl-b{padding:8px 18px;font-size:12px;font-weight:700;border:none;cursor:pointer;background:#fff;color:#9CA3AF;transition:.15s}
+.tgl-b.on{background:#1C2834;color:#fff}
+.tm-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tm-in{font-size:26px;font-weight:800;width:72px;border:none;background:transparent;color:#111827}
+.tm-unit{font-size:14px;color:#9CA3AF}
+.est-km{font-size:12px;color:#6B7280;background:#F3F4F6;border-radius:8px;padding:5px 12px;margin-top:6px;display:none}
+.st-ok{background:#D1FAE5;color:#065F46}
+.st-er{background:#FEE2E2;color:#991B1B}
+.st-wa{background:#FEF3C7;color:#92400E}
+.st-in{background:#DBEAFE;color:#1E40AF}
+
+@media(max-width:480px){
+  .fr,.fr3,.bg2{grid-template-columns:1fr}
+  .ch3{grid-template-columns:1fr 1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="hd">
+  <div class="hd-top">
+    <span class="hd-brand">Materiales Palenque</span>
+    <span class="hd-title">Calculadora de Fletes</span>
+    <span id="save-ind" style="margin-left:auto;font-size:11px;opacity:.45;transition:opacity .6s;white-space:nowrap;padding:3px 8px;border-radius:6px"></span>
+    <span id="sync-ind" onclick="saveSheets()" title="Hay cambios sin guardar en Google Sheets. Haz clic para sincronizar." style="display:none;cursor:pointer;font-size:11px;font-weight:700;background:rgba(245,158,11,.3);color:#FDE68A;padding:4px 10px;border-radius:6px;white-space:nowrap;margin-left:6px;border:1px solid rgba(245,158,11,.4)">⚠️ Sheets desactualizado — Sincronizar</span>
+  </div>
+  <div class="nav">
+    <button class="nb on" onclick="setTab('calc')">🚛 Calculadora</button>
+    <button class="nb" onclick="setTab('prods')">📦 Productos</button>
+    <button class="nb" onclick="setTab('vehs')">🚐 Vehículos</button>
+    <button class="nb" onclick="setTab('cfg')">⚙️ Config</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ═══════════════════ TAB CALCULADORA ═══════════════════ -->
+<div id="tab-calc" class="tab on">
+  <div id="veh-grid" class="vg"></div>
+
+  <div class="card">
+    <span class="ct">Distancia de entrega</span>
+    <div class="tgl">
+      <button class="tgl-b on" id="tgl-km" onclick="setMode(false)">📍 Por kilómetros</button>
+      <button class="tgl-b" id="tgl-tm" onclick="setMode(true)">⏱ Por tiempo</button>
+    </div>
+
+    <!-- MODO KM -->
+    <div id="mode-km">
+      <div class="km-r">
+        <div style="display:flex;align-items:baseline;gap:5px">
+          <input class="km-in" type="number" id="km-val" value="25" min="1" oninput="go()">
+          <span class="mu" style="font-size:14px">km solo ida</span>
+        </div>
+        <div class="km-nfo" id="km-info">Viaje redondo: <strong>50 km</strong></div>
+      </div>
+    </div>
+
+    <!-- MODO TIEMPO -->
+    <div id="mode-tm" style="display:none">
+      <p class="msm mu" style="margin-bottom:10px">Ingresa el tiempo estimado de viaje al destino (solo ida). La distancia se calcula automáticamente.</p>
+      <div class="tm-row">
+        <div style="display:flex;align-items:baseline;gap:4px">
+          <input class="tm-in" type="number" id="t-hrs" value="0" min="0" max="23" oninput="go()">
+          <span class="tm-unit">hrs</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:4px">
+          <input class="tm-in" type="number" id="t-min" value="30" min="0" max="59" oninput="go()">
+          <span class="tm-unit">min</span>
+        </div>
+        <div class="km-nfo" id="tm-info" style="flex:1"></div>
+      </div>
+      <div class="est-km" id="est-km">📍 Distancia estimada: <strong id="est-km-val">—</strong> km · Velocidad promedio: <span id="est-spd">50</span> km/h</div>
+    </div>
+  </div>
+
+  <div class="sb">
+    <span class="sb-ttl">📋 Validar ticket de SICAR</span>
+    <p class="msm mu">Si ya tienes la cotización en SICAR, ingresa el total aquí para verificar si cumple los mínimos del vehículo seleccionado.</p>
+    <div class="sb-row">
+      <input class="sb-in fi" type="number" id="sicar" placeholder="$0" min="0" oninput="renderSicar()">
+      <button class="btn bo bsm" onclick="document.getElementById('sicar').value='';renderSicar()">✕ Limpiar</button>
+    </div>
+    <div id="sicar-res"></div>
+  </div>
+
+  <div class="card">
+    <span class="ct">Carga del viaje</span>
+    <div class="ar">
+      <select id="add-sel"></select>
+      <input type="number" id="add-qty" value="200" min="1" class="fi">
+      <button class="btn bp" onclick="addCart()">+ Agregar</button>
+    </div>
+    <div id="cart-list"><div class="empty">Agrega productos para calcular el flete</div></div>
+    <div id="cap-bar"></div>
+  </div>
+
+  <div id="results"></div>
+</div>
+
+<!-- ═══════════════════ TAB PRODUCTOS ═══════════════════ -->
+<div id="tab-prods" class="tab">
+  <div class="tr-hd">
+    <div id="cat-filter" class="fb"></div>
+    <button class="btn bp bsm" onclick="editProd(null)">+ Nuevo producto</button>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div id="prod-wrap" style="overflow-x:auto"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════ TAB VEHÍCULOS ═══════════════════ -->
+<div id="tab-vehs" class="tab">
+  <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+    <button class="btn bp bsm" onclick="editVeh(null)">+ Nuevo vehículo</button>
+  </div>
+  <div id="veh-list" class="vm"></div>
+</div>
+
+<!-- ═══════════════════ TAB CONFIG ═══════════════════ -->
+<div id="tab-cfg" class="tab">
+  <div class="card">
+    <div class="cs2">
+      <span class="cs2-t">Parámetros de cálculo</span>
+      <div class="fr3">
+        <div class="fg"><label class="fl">Margen en flete (%)</label><input class="fi" type="number" id="cfg-mar" min="5" max="80" oninput="saveCfg()"></div>
+        <div class="fg"><label class="fl">Salario diario / persona ($)</label><input class="fi" type="number" id="cfg-wag" min="100" oninput="saveCfg()"></div>
+        <div class="fg"><label class="fl">Velocidad promedio (km/h)</label><input class="fi" type="number" id="cfg-spd" min="20" max="120" oninput="saveCfg()" title="Velocidad promedio para calcular distancia por tiempo. Recomendado: 45-55 km/h en Chiapas."></div>
+      </div>
+      <div class="fg" style="margin-top:8px">
+        <label class="fl">Actualizar datos desde Sheets cada</label>
+        <select class="fi" id="cfg-ref" onchange="saveCfg()">
+          <option value="0">Desactivado (manual)</option>
+          <option value="10">10 segundos</option>
+          <option value="15" selected>15 segundos</option>
+          <option value="30">30 segundos</option>
+          <option value="60">1 minuto</option>
+        </select>
+      </div>
+      <div class="bgrp" style="margin-top:8px">
+        <button class="btn bp" onclick="saveCfgAndSync()">💾 Guardar configuración</button>
+      </div>
+    </div>
+    <hr class="sep">
+    <div class="cs2">
+      <span class="cs2-t">☁️ Sincronización con Google Sheets</span>
+      <p class="msm mu" style="margin-bottom:10px">Conecta un Google Apps Script para cargar y guardar datos desde una hoja de cálculo. Ver instrucciones más abajo.</p>
+      <div class="fg"><label class="fl">URL del Apps Script desplegado</label><input class="fi" type="url" id="cfg-url" placeholder="https://script.google.com/macros/s/..." oninput="saveCfg()"></div>
+      <div class="bgrp">
+        <button class="btn bo" onclick="loadSheets()">⬇ Cargar de Sheets</button>
+        <button class="btn bs" onclick="saveSheets()">⬆ Guardar en Sheets</button>
+      </div>
+      <div id="sh-status"></div>
+    </div>
+    <hr class="sep">
+    <div class="cs2">
+      <span class="cs2-t">💾 Respaldo local</span>
+      <div class="bgrp">
+        <button class="btn bo" onclick="expJSON()">⬇ Exportar JSON</button>
+        <label class="btn bo" style="cursor:pointer">⬆ Importar JSON<input type="file" accept=".json" style="display:none" onchange="impJSON(this)"></label>
+        <button class="btn bd bsm" onclick="resetAll()">↺ Restablecer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="cs2-t" style="font-size:13px;font-weight:700;display:block;margin-bottom:10px">📋 Código para Google Apps Script</span>
+    <p class="msm mu" style="margin-bottom:10px">
+      <strong>Pasos:</strong><br>
+      1. Crea un Google Sheets con 3 pestañas: <strong>Productos</strong>, <strong>Vehiculos</strong> y <strong>Config</strong><br>
+      2. Ve a <em>Extensiones → Apps Script</em> y pega el código de abajo<br>
+      3. Haz clic en <em>Implementar → Nueva implementación → Aplicación web</em><br>
+      4. Ejecutar como: <strong>Yo</strong> · Acceso: <strong>Cualquier persona</strong><br>
+      5. Copia la URL y pégala arriba
+    </p>
+    <button class="btn bo bsm" onclick="copyCode()" style="margin-bottom:6px">📋 Copiar código</button>
+    <pre class="code" id="gs-code">// ─── MATERIALES PALENQUE — Google Apps Script ───────────────────────────
+const SH = { p:'Productos', v:'Vehiculos', c:'Config' };
+
+function doGet(e) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  return out({ products:readSheet(ss,SH.p), vehicles:readSheet(ss,SH.v), config:readCfg(ss) });
+}
+
+function doPost(e) {
+  try {
+    const d = JSON.parse(e.postData.contents);
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    if (d.products) writeSheet(ss, SH.p, d.products);
+    if (d.vehicles) writeSheet(ss, SH.v, d.vehicles);
+    if (d.config)   writeCfg(ss, d.config);
+    return out({ok:true});
+  } catch(err){ return out({error:err.toString()}); }
+}
+
+function readSheet(ss,name){
+  const sh=ss.getSheetByName(name); if(!sh) return [];
+  const rows=sh.getDataRange().getValues(); if(rows.length<2) return [];
+  const h=rows[0]; return rows.slice(1).map(r=>{const o={};h.forEach((k,i)=>o[k]=r[i]);return o;});
+}
+
+function writeSheet(ss,name,data){
+  let sh=ss.getSheetByName(name)||ss.insertSheet(name);
+  sh.clearContents(); if(!data.length) return;
+  const h=Object.keys(data[0]); sh.appendRow(h);
+  data.forEach(r=>sh.appendRow(h.map(k=>r[k]??'')));
+}
+
+function readCfg(ss){
+  const sh=ss.getSheetByName(SH.c); if(!sh) return {};
+  const o={}; sh.getDataRange().getValues().forEach(r=>{if(r[0])o[r[0]]=r[1];}); return o;
+}
+
+function writeCfg(ss,cfg){
+  let sh=ss.getSheetByName(SH.c)||ss.insertSheet(SH.c);
+  sh.clearContents(); Object.entries(cfg).forEach(([k,v])=>sh.appendRow([k,v]));
+}
+
+function out(data){
+  return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
+}</pre>
+  </div>
+</div>
+
+</div><!-- end wrap -->
+
+<!-- MODAL -->
+<div id="modal" class="mo" style="display:none" onclick="if(event.target===this)closeMod()">
+  <div class="mb" id="modal-box"></div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// DEFAULTS
+// ══════════════════════════════════════════════════════════
+const DEF_P=[
+  {id:'b10',  name:'Block hueco #10',         kg:11,  price:11,    unit:'pieza', cat:'Block'},
+  {id:'b12',  name:'Block hueco #12',         kg:13,  price:14,    unit:'pieza', cat:'Block'},
+  {id:'bm14', name:'Block masizo 10x14',       kg:12,  price:9.5,   unit:'pieza', cat:'Block'},
+  {id:'bm20', name:'Block masizo 10x20',       kg:18,  price:12.5,  unit:'pieza', cat:'Block'},
+  {id:'cem50',name:'Cemento Holcim 50 kg',    kg:50,  price:195,   unit:'saco',  cat:'Cemento'},
+  {id:'var38',name:'Varilla 3/8" (tramo 6m)', kg:7,   price:85,    unit:'tramo', cat:'Acero'},
+  {id:'alam', name:'Alambron 1/4" (rollo)',   kg:100, price:850,   unit:'rollo', cat:'Acero'},
+  {id:'alamr',name:'Alambre recocido (kg)',   kg:1,   price:32,    unit:'kg',    cat:'Acero'},
+  {id:'arena',name:'Lata de arena',           kg:50,  price:80,    unit:'lata',  cat:'Agregados'},
+  {id:'grava',name:'Lata de grava 1/2"',     kg:45,  price:90,    unit:'lata',  cat:'Agregados'},
+  {id:'lam',  name:'Lamina ondulada Ternium', kg:8,   price:320,   unit:'pieza', cat:'Lamina'},
+  {id:'ferr', name:'Ferreteria variada',      kg:10,  price:500,   unit:'caja',  cat:'Ferreteria'},
+  {id:'pvc4', name:'Tubo sanitario PVC 4"',  kg:3,   price:60,    unit:'pieza', cat:'Ferreteria'},
+  {id:'cpvc', name:'Tubo CPVC 1/2"',         kg:1,   price:85,    unit:'pieza', cat:'Ferreteria'},
+  {id:'cable',name:'Cable THW #12 (rollo)',   kg:5,   price:800,   unit:'rollo', cat:'Ferreteria'},
+  {id:'poli', name:'Poliducto corrugado 3/4"',kg:1,  price:13.5,  unit:'pieza', cat:'Ferreteria'},
+  {id:'imper',name:'Impermeabilizante 19 L',  kg:20,  price:320,   unit:'cubeta',cat:'Ferreteria'},
+];
+const DEF_V=[
+  {id:'nissan',name:'Nissan 1 Ton', icon:'🚐',maxKg:1000, costPerKm:5,  crew:2,deprPerKm:0.5, minKg:150, minTicket:2000, minFlete:300, accent:'#1A5276',light:'#D6EAF8',border:'#85C1E9',desc:'Ferreteria y cargas ligeras'},
+  {id:'t3',    name:'Camioneta 3T', icon:'🚛',maxKg:3000, costPerKm:10, crew:3,deprPerKm:1.2, minKg:500, minTicket:5000, minFlete:700, accent:'#1E8449',light:'#D5F5E3',border:'#82E0AA',desc:'Block, cemento, mediano'},
+  {id:'t12',   name:'Camion 12 Ton',icon:'🚚',maxKg:12000,costPerKm:15, crew:2,deprPerKm:2.5, minKg:3000,minTicket:20000,minFlete:1500,accent:'#784212',light:'#FDEBD0',border:'#F0B27A',desc:'Volumenes grandes y pesados'},
+];
+const DEF_CFG={margin:40,wage:150,sheetsUrl:'',speed:50,refresh:15};
+const CATI={'Block':'🧱','Cemento':'🏗️','Acero':'⚙️','Agregados':'🪨','Lamina':'🏠','Ferreteria':'🔧','Otro':'📦'};
+
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+let prods=[],vehs=[],cfg={...DEF_CFG};
+let selV='t3',km=25,tMode=false,cart=[],catF='Todos',curTab='calc',refreshTimer=null;
+
+// ══════════════════════════════════════════════════════════
+// AUTO-REFRESH
+// ══════════════════════════════════════════════════════════
+
+async function silentLoad(){
+  const url=(cfg.sheetsUrl||'').trim();
+  if(!url)return;
+  // Don't refresh while a modal is open (user might be editing)
+  if(document.getElementById('modal')?.style.display==='flex')return;
+  try{
+    const r=await fetch(url,{redirect:'follow'});
+    const d=await r.json();
+    if(d.error||!d)return;
+    let changed=false;
+    if(d.products&&d.products.length){
+      prods=d.products.map(p=>({...p,kg:+p.kg,price:+p.price}));changed=true;
+    }
+    if(d.vehicles&&d.vehicles.length){
+      vehs=d.vehicles.map(v=>({...v,maxKg:+v.maxKg,costPerKm:+v.costPerKm,crew:+v.crew,
+        deprPerKm:+v.deprPerKm,minKg:+v.minKg,minTicket:+v.minTicket,minFlete:+v.minFlete}));changed=true;
+    }
+    if(d.config){
+      cfg={...cfg,...d.config,
+        margin:+(d.config.margin||cfg.margin),
+        wage:+(d.config.wage||cfg.wage),
+        speed:+(d.config.speed||cfg.speed),
+        refresh:+(d.config.refresh||cfg.refresh||15)};
+      changed=true;
+    }
+    if(changed){
+      // Save fresh data locally and re-render silently
+      localStorage.setItem('mp_p',JSON.stringify(prods));
+      localStorage.setItem('mp_v',JSON.stringify(vehs));
+      localStorage.setItem('mp_c',JSON.stringify(cfg));
+      renderAll();
+      // Show subtle update timestamp in header
+      const el=document.getElementById('save-ind');
+      if(el){
+        const t=new Date();
+        const hh=t.getHours().toString().padStart(2,'0');
+        const mm=t.getMinutes().toString().padStart(2,'0');
+        const ss=t.getSeconds().toString().padStart(2,'0');
+        el.textContent='⟳ '+hh+':'+mm+':'+ss;
+        el.style.opacity='.6';el.style.color='rgba(255,255,255,.8)';
+      }
+    }
+  }catch(e){/* silent fail — no interruption */}
+}
+
+function startAutoRefresh(){
+  if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null;}
+  const secs=+(cfg.refresh||0);
+  const url=(cfg.sheetsUrl||'').trim();
+  if(secs>0&&url){
+    refreshTimer=setInterval(silentLoad,secs*1000);
+  }
+  // Also update the select in config tab if it's visible
+  const sel=document.getElementById('cfg-ref');
+  if(sel)sel.value=secs;
+}
+
+// ══════════════════════════════════════════════════════════
+// PERSISTENCE
+// ══════════════════════════════════════════════════════════
+function loadLocal(){
+  try{
+    const pRaw=localStorage.getItem('mp_p')||sessionStorage.getItem('mp_p');
+    const vRaw=localStorage.getItem('mp_v')||sessionStorage.getItem('mp_v');
+    const cRaw=localStorage.getItem('mp_c');
+    const ts=localStorage.getItem('mp_ts');
+    prods=pRaw?JSON.parse(pRaw):JSON.parse(JSON.stringify(DEF_P));
+    vehs=vRaw?JSON.parse(vRaw):JSON.parse(JSON.stringify(DEF_V));
+    cfg={...DEF_CFG,...(cRaw?JSON.parse(cRaw):{})};
+    if(ts){
+      setTimeout(()=>{
+        const el=document.getElementById('save-ind');if(!el)return;
+        const t=new Date(ts);
+        const hh=t.getHours().toString().padStart(2,'0'),mm2=t.getMinutes().toString().padStart(2,'0');
+        const dd=t.toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit',year:'2-digit'});
+        el.textContent='Ultimo guardado: '+dd+' '+hh+':'+mm2;
+        el.style.opacity='.55';el.style.color='rgba(255,255,255,.8)';
+      },700);
+    }
+  }catch(e){
+    console.warn('Error al cargar:',e);
+    prods=JSON.parse(JSON.stringify(DEF_P));
+    vehs=JSON.parse(JSON.stringify(DEF_V));
+    cfg={...DEF_CFG};
+  }
+}
+function saveLocal(){
+  try{
+    const ts=new Date().toISOString();
+    localStorage.setItem('mp_p',JSON.stringify(prods));
+    localStorage.setItem('mp_v',JSON.stringify(vehs));
+    localStorage.setItem('mp_c',JSON.stringify(cfg));
+    localStorage.setItem('mp_ts',ts);
+    sessionStorage.setItem('mp_p',JSON.stringify(prods));
+    sessionStorage.setItem('mp_v',JSON.stringify(vehs));
+    showSaved(ts);
+  }catch(e){console.warn('Error al guardar:',e);}
+}
+function showSaved(ts){
+  const el=document.getElementById('save-ind');if(!el)return;
+  const t=new Date(ts);
+  const hh=t.getHours().toString().padStart(2,'0'),mm2=t.getMinutes().toString().padStart(2,'0');
+  el.textContent='Guardado '+hh+':'+mm2;
+  el.style.opacity='1';el.style.background='rgba(5,150,105,.3)';el.style.color='#A7F3D0';
+  clearTimeout(window._saveT);
+  window._saveT=setTimeout(()=>{el.style.opacity='.45';el.style.background='transparent';el.style.color='rgba(255,255,255,.8)';},3500);
+}
+
+// ══════════════════════════════════════════════════════════
+// GOOGLE SHEETS
+// ══════════════════════════════════════════════════════════
+async function loadSheets(){
+  const url=cfg.sheetsUrl.trim();
+  if(!url){if(!silent)shStat('⚠️ Ingresa la URL del Apps Script primero.','wa');return false;}
+  shStat('⏳ Cargando datos de Google Sheets...','in');
+  try{
+    const r=await fetch(url,{redirect:'follow'});
+    const d=await r.json();
+    if(d.error)throw new Error(d.error);
+    if(d.products&&d.products.length)prods=d.products.map(p=>({...p,kg:+p.kg,price:+p.price}));
+    if(d.vehicles&&d.vehicles.length)vehs=d.vehicles.map(v=>({...v,maxKg:+v.maxKg,costPerKm:+v.costPerKm,crew:+v.crew,deprPerKm:+v.deprPerKm,minKg:+v.minKg,minTicket:+v.minTicket,minFlete:+v.minFlete}));
+    if(d.config)cfg={...cfg,...d.config,margin:+(d.config.margin||cfg.margin),wage:+(d.config.wage||cfg.wage)};
+    saveLocal();renderAll();startAutoRefresh();
+    shStat('✅ Datos cargados correctamente.','ok');
+  }catch(e){shStat('❌ Error: '+e.message+'. Verifica la URL y permisos del Apps Script.','er');}
+}
+async function saveSheets(silent=false){
+  const url=cfg.sheetsUrl.trim();
+  if(!url){shStat('⚠️ Ingresa la URL del Apps Script primero.','wa');return;}
+  if(!silent)shStat('⏳ Guardando en Google Sheets...','in');
+  try{
+    const r=await fetch(url,{method:'POST',body:JSON.stringify({products:prods,vehicles:vehs,config:{margin:cfg.margin,wage:cfg.wage,speed:cfg.speed||50}}),redirect:'follow'});
+    const d=await r.json();
+    if(d.error)throw new Error(d.error);
+    if(!silent)shStat('✅ Datos guardados en Google Sheets.','ok');
+    const si=document.getElementById('sync-ind');if(si)si.style.display='none';
+    return true;
+  }catch(e){if(!silent)shStat('❌ Error al guardar: '+e.message,'er');return false;}
+}
+function shStat(msg,t){
+  const c={ok:'st-ok',er:'st-er',wa:'st-wa',in:'st-in'};
+  const el=document.getElementById('sh-status');
+  if(el)el.innerHTML=`<div class="stat ${c[t]||'st-in'}">${msg}</div>`;
+}
+
+// ══════════════════════════════════════════════════════════
+// JSON BACKUP
+// ══════════════════════════════════════════════════════════
+function expJSON(){
+  const blob=new Blob([JSON.stringify({products:prods,vehicles:vehs,config:cfg},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='materiales-palenque.json';a.click();
+}
+function impJSON(inp){
+  const f=inp.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{const d=JSON.parse(e.target.result);
+      if(d.products)prods=d.products;
+      if(d.vehicles)vehs=d.vehicles;
+      if(d.config)cfg={...DEF_CFG,...d.config};
+      saveLocal();if(cfg.sheetsUrl&&cfg.sheetsUrl.trim())saveSheets(true);renderAll();alert('✅ Datos importados y sincronizados con Sheets.');
+    }catch(_){alert('❌ Archivo inválido.');}
+  };
+  r.readAsText(f);inp.value='';
+}
+function resetAll(){
+  if(!confirm('¿Restablecer todos los datos predeterminados? No se puede deshacer.'))return;
+  prods=JSON.parse(JSON.stringify(DEF_P));
+  vehs=JSON.parse(JSON.stringify(DEF_V));
+  cfg={...DEF_CFG};saveLocal();if(cfg.sheetsUrl&&cfg.sheetsUrl.trim())saveSheets(true);renderAll();
+}
+
+// ══════════════════════════════════════════════════════════
+// CALCULATION
+// ══════════════════════════════════════════════════════════
+function getV(){return vehs.find(v=>v.id===selV)||vehs[0];}
+function compute(){
+  const v=getV();if(!v||!cart.length)return null;
+  const k=Math.max(1,km);
+  const mg=Math.max(5,cfg.margin),wg=Math.max(100,cfg.wage);
+  const tKg=cart.reduce((s,ci)=>{const p=prods.find(p=>p.id===ci.id);return s+(p?p.kg*ci.qty:0);},0);
+  const tVal=cart.reduce((s,ci)=>{const p=prods.find(p=>p.id===ci.id);return s+(p?p.price*ci.qty:0);},0);
+  const ldPct=v.maxKg>0?(tKg/v.maxKg)*100:0;
+  const rKm=k*2,fuel=rKm*v.costPerKm,hrs=rKm/55+1.2;
+  const crew=v.crew*(wg/8)*hrs,depr=rKm*v.deprPerKm,op=fuel+crew+depr;
+  const raw=op/(1-mg/100);
+  const flete=Math.max(Math.ceil(raw/50)*50,v.minFlete||0);
+  const tTkt=tVal+flete;
+  return{tKg,tVal,ldPct,rKm,hrs,fuel,crew,depr,op,flete,tTkt,
+    wOk:tKg>=(v.minKg||0),tkOk:tTkt>=(v.minTicket||0),cOk:tKg<=v.maxKg,eOk:ldPct>=40,v,k,mg};
+}
+
+// ══════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════
+const $N=n=>'$'+Math.round(n).toLocaleString('es-MX');
+const kgS=n=>n>=1000?(n/1000).toFixed(1)+' T':n+' kg';
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const allCats=()=>['Todos',...new Set(prods.map(p=>p.cat))];
+const ci=id=>CATI[id]||'📦';
+
+// ══════════════════════════════════════════════════════════
+// TAB NAVIGATION
+// ══════════════════════════════════════════════════════════
+function setTab(t){
+  curTab=t;
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(el=>el.classList.remove('on'));
+  document.getElementById('tab-'+t).classList.add('on');
+  const tabs=['calc','prods','vehs','cfg'];
+  document.querySelectorAll('.nb')[tabs.indexOf(t)].classList.add('on');
+  if(t==='prods')renderProds();
+  if(t==='vehs')renderVehs();
+  if(t==='cfg')renderCfg();
+}
+
+// ══════════════════════════════════════════════════════════
+// RENDER ALL
+// ══════════════════════════════════════════════════════════
+function renderAll(){
+  renderCalc();
+  if(curTab==='prods')renderProds();
+  if(curTab==='vehs')renderVehs();
+  if(curTab==='cfg')renderCfg();
+}
+
+// ══════════════════════════════════════════════════════════
+// CALCULATOR
+// ══════════════════════════════════════════════════════════
+function renderCalc(){
+  // Vehicle grid
+  const vg=document.getElementById('veh-grid');
+  if(vg)vg.innerHTML=vehs.map(v=>{
+    const a=v.id===selV;
+    return`<button class="vb" onclick="selVeh('${v.id}')"
+      style="${a?`border:2px solid ${v.accent};background:${v.light};`:``}">
+      <span class="vb-ico">${v.icon||'🚛'}</span>
+      <span class="vb-nm" style="${a?`color:${v.accent}`:''}">${v.name}</span>
+      <span class="vb-mx">${kgS(v.maxKg)} max.</span>
+      <span class="vb-ds">${v.desc||''}</span>
+    </button>`;
+  }).join('');
+  // Product select
+  const sel=document.getElementById('add-sel');
+  if(sel){
+    const grp={};prods.forEach(p=>(grp[p.cat]=grp[p.cat]||[]).push(p));
+    sel.innerHTML=Object.entries(grp).map(([cat,ps])=>
+      `<optgroup label="${ci(cat)} ${cat}">${ps.map(p=>`<option value="${p.id}">${p.name} · $${p.price}/${p.unit}</option>`).join('')}</optgroup>`
+    ).join('');
+  }
+  renderCart();renderResults();renderSicar();
+}
+
+function renderCart(){
+  const el=document.getElementById('cart-list');
+  const cb=document.getElementById('cap-bar');
+  if(!el)return;
+  if(!cart.length){el.innerHTML='<div class="empty">Agrega productos para calcular</div>';if(cb)cb.innerHTML='';return;}
+  el.innerHTML=cart.map((ci2,i)=>{
+    const p=prods.find(p=>p.id===ci2.id);if(!p)return'';
+    return`<div class="cr">
+      <div class="ci"><div class="cn">${ci(p.cat)} ${p.name}</div><div class="cs">${kgS(p.kg*ci2.qty)} · ${p.unit}</div></div>
+      <input class="cq fi" type="number" value="${ci2.qty}" min="1" onchange="updCart(${i},+this.value)">
+      <div class="cv">${$N(p.price*ci2.qty)}</div>
+      <button class="xb" onclick="remCart(${i})">×</button>
+    </div>`;
+  }).join('');
+  const c=compute();
+  if(c&&cb){
+    const bc=c.ldPct>100?'#DC2626':c.ldPct<40?'#D97706':'#059669';
+    const pc=c.ldPct>100?'#DC2626':c.ldPct<40?'#B45309':'#15803D';
+    cb.innerHTML=`<div class="cpw">
+      <div class="cpl"><span class="mu">Peso: <strong>${kgS(c.tKg)}</strong> / <strong>${kgS(c.v.maxKg)}</strong></span><span style="font-weight:800;color:${pc}">${Math.round(c.ldPct)}% capacidad</span></div>
+      <div class="cpb"><div class="cpf" style="width:${Math.min(c.ldPct,100)}%;background:${bc}"></div></div>
+      <div class="cpm"><span>Min carga: <strong>${kgS(c.v.minKg||0)}</strong></span><span>Min ticket: <strong>${$N(c.v.minTicket||0)}</strong></span><span>Min flete: <strong>${$N(c.v.minFlete||0)}</strong></span></div>
+    </div>`;
+  }
+}
+
+function renderSicar(){
+  const val=+document.getElementById('sicar')?.value||0;
+  const res=document.getElementById('sicar-res');
+  if(!res)return;
+  if(!val){res.innerHTML='';return;}
+  const v=getV();if(!v)return;
+
+  // Calcular flete con vehiculo y distancia actuales
+  const mg=Math.max(5,cfg.margin),wg=Math.max(100,cfg.wage);
+  const rKm=km*2;
+  const fuel=rKm*v.costPerKm;
+  const hrs=rKm/55+1.2;
+  const crewC=v.crew*(wg/8)*hrs;
+  const depr=rKm*v.deprPerKm;
+  const op=fuel+crewC+depr;
+  const raw=op/(1-mg/100);
+  const flete=Math.max(Math.ceil(raw/50)*50,v.minFlete||0);
+  const total=val+flete;
+  const anticipo=total*0.5;
+
+  // Validacion de minimos
+  const ok=val>=(v.minTicket||0);
+  const pct=v.minTicket>0?Math.min(Math.round(val/v.minTicket*100),100):100;
+  const bc=ok?'#059669':'#DC2626';
+  const miss=ok?0:(v.minTicket||0)-val;
+
+  res.innerHTML=`<div style="margin-top:12px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div style="background:#1C2834;border-radius:10px;padding:12px 14px;text-align:center">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.5);margin-bottom:3px">Flete a cobrar</div>
+        <div style="font-size:28px;font-weight:900;color:#fff;letter-spacing:-1px">${$N(flete)}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">${km} km · ${v.name}</div>
+      </div>
+      <div style="background:#F3F4F6;border-radius:10px;padding:12px 14px;text-align:center">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:3px">Total con flete</div>
+        <div style="font-size:28px;font-weight:900;color:#111827;letter-spacing:-1px">${$N(total)}</div>
+        <div style="font-size:11px;color:#9CA3AF;margin-top:2px">Anticipo 50%: ${$N(anticipo)}</div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:#9CA3AF;margin-bottom:6px">
+      Desglose del flete: Combustible ${$N(fuel)} + Personal ${$N(crewC)} + Desgaste ${$N(depr)} = Costo ${$N(op)} → Flete con margen ${mg}%
+    </div>
+    <div class="cpl">
+      <span class="mu">Mercancia SICAR: <strong>${$N(val)}</strong> / Min: <strong>${$N(v.minTicket||0)}</strong></span>
+      <span style="font-weight:800;color:${bc}">${pct}%</span>
+    </div>
+    <div class="cpb"><div class="cpf" style="width:${pct}%;background:${bc}"></div></div>
+    <div style="margin-top:8px;font-size:13px;font-weight:700;color:${bc}">
+      ${ok
+        ?`✅ Mercancia cumple el minimo — Cotizar al cliente: ${$N(total)}`
+        :`❌ Falta ${$N(miss)} en mercancia para el minimo del ${v.name}`}
+    </div>
+  </div>`;
+}
+
+function renderResults(){
+  const el=document.getElementById('results');if(!el)return;
+  if(!cart.length){el.innerHTML='';return;}
+  const c=compute();if(!c){el.innerHTML='';return;}
+  const v=c.v;
+  const checks=[
+    {l:'Peso minimo',  ok:c.wOk, d:c.wOk?`${kgS(c.tKg)} ✓`:`Min ${kgS(v.minKg||0)}`},
+    {l:'Ticket minimo',ok:c.tkOk,d:c.tkOk?`${$N(c.tTkt)} ✓`:`Min ${$N(v.minTicket||0)}`},
+    {l:'Capacidad',    ok:c.cOk, d:c.cOk?`${Math.round(c.ldPct)}% ✓`:`Excede ${kgS(v.maxKg)}`},
+  ];
+  let dm,ds;
+  if(!c.cOk){dm=`❌ Excedes la capacidad por ${kgS(c.tKg-v.maxKg)}. Usa vehiculo mayor.`;ds={bg:'#FEE2E2',br:'#FCA5A5',tx:'#991B1B'};}
+  else if(!c.wOk){dm=`⚠️ Carga minima: agrega ${kgS((v.minKg||0)-c.tKg)} mas para este vehiculo.`;ds={bg:'#FEF3C7',br:'#FCD34D',tx:'#92400E'};}
+  else if(!c.tkOk){dm=`⚠️ Ticket minimo ${$N(v.minTicket||0)}: faltan ${$N((v.minTicket||0)-c.tTkt)}.`;ds={bg:'#FEF3C7',br:'#FCD34D',tx:'#92400E'};}
+  else if(!c.eOk){dm=`💡 Vehiculo al ${Math.round(c.ldPct)}% — considera usar unidad menor.`;ds={bg:'#DBEAFE',br:'#93C5FD',tx:'#1E40AF'};}
+  else{dm=`✅ Entrega aprobada · Anticipo sugerido: ${$N(c.tTkt*.5)}`;ds={bg:'#D1FAE5',br:'#6EE7B7',tx:'#065F46'};}
+
+  el.innerHTML=`
+    <div class="bg2">
+      <div class="bc" style="background:${v.light};border:2px solid ${v.border}">
+        <div class="bl" style="color:${v.accent}">Flete a cobrar</div>
+        <div class="bv" style="color:${v.accent}">${$N(c.flete)}</div>
+        <div class="bn" style="color:${v.accent}">Margen ${c.mg}% sobre costo</div>
+      </div>
+      <div class="bc" style="background:#F9FAFB;border:1px solid #E5E7EB">
+        <div class="bl" style="color:#9CA3AF">Ticket total</div>
+        <div class="bv">${$N(c.tTkt)}</div>
+        <div class="bn" style="color:#9CA3AF">mercancia + flete</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="ct">Desglose del viaje</span>
+      <div class="dr"><span class="mu">Combustible (${c.rKm} km)</span><span>${$N(c.fuel)}</span></div>
+      <div class="dr"><span class="mu">Personal (${v.crew} personas · ${c.hrs.toFixed(1)} hrs)</span><span>${$N(c.crew)}</span></div>
+      <div class="dr"><span class="mu">Desgaste del vehiculo</span><span>${$N(c.depr)}</span></div>
+      <div class="dr dt"><span>Costo real del viaje</span><span>${$N(c.op)}</span></div>
+      <div class="dr"><span class="mu">Utilidad del flete</span><span class="dg">+${$N(c.flete-c.op)}</span></div>
+    </div>
+    <div class="ch3">
+      ${checks.map(ch=>`<div class="cc" style="background:${ch.ok?'#D1FAE5':'#FEE2E2'};border:1px solid ${ch.ok?'#6EE7B7':'#FCA5A5'}">
+        <div class="ci2">${ch.ok?'✅':'❌'}</div>
+        <div class="cl2" style="color:${ch.ok?'#065F46':'#991B1B'}">${ch.l}</div>
+        <div class="cd" style="color:${ch.ok?'#059669':'#DC2626'}">${ch.d}</div>
+      </div>`).join('')}
+    </div>
+    <div class="dec" style="background:${ds.bg};border:1.5px solid ${ds.br};color:${ds.tx}">${dm}</div>`;
+}
+
+// ══════════════════════════════════════════════════════════
+// PRODUCTS TAB
+// ══════════════════════════════════════════════════════════
+function renderProds(){
+  const cf=document.getElementById('cat-filter');
+  if(cf)cf.innerHTML=allCats().map(c=>`<button class="fc${catF===c?' on':''}" onclick="setCat('${c}')">${c!=='Todos'?(ci(c)+' '):''}${c}</button>`).join('');
+  const ps=catF==='Todos'?prods:prods.filter(p=>p.cat===catF);
+  const wp=document.getElementById('prod-wrap');if(!wp)return;
+  if(!ps.length){wp.innerHTML='<div class="empty">No hay productos en esta categoria.</div>';return;}
+  wp.innerHTML=`<table class="pt">
+    <thead><tr><th>Categoria</th><th>Producto</th><th>Peso kg</th><th>Precio</th><th>Unidad</th><th></th></tr></thead>
+    <tbody>${ps.map(p=>`<tr>
+      <td><span class="cbg">${ci(p.cat)} ${p.cat}</span></td>
+      <td>${p.name}</td><td>${p.kg} kg</td><td>${$N(p.price)}</td><td>${p.unit}</td>
+      <td style="white-space:nowrap">
+        <button class="btn bo bsm" onclick="editProd('${p.id}')">✏️ Editar</button>
+        <button class="btn bsm" style="background:#FEE2E2;color:#991B1B;border:none;margin-left:4px" onclick="delProd('${p.id}')">🗑</button>
+      </td></tr>`).join('')}
+    </tbody></table>`;
+}
+function setCat(c){catF=c;renderProds();}
+
+// ══════════════════════════════════════════════════════════
+// VEHICLES TAB
+// ══════════════════════════════════════════════════════════
+function renderVehs(){
+  const el=document.getElementById('veh-list');if(!el)return;
+  if(!vehs.length){el.innerHTML='<div class="empty">No hay vehiculos registrados.</div>';return;}
+  el.innerHTML=vehs.map(v=>`<div class="vc" style="border-left:4px solid ${v.accent||'#E5E7EB'}">
+    <div class="vi">${v.icon||'🚛'}</div>
+    <div style="flex:1">
+      <div class="vn2">${v.name}</div>
+      <div class="vs">
+        <strong>Cap:</strong> ${kgS(v.maxKg)} &nbsp;·&nbsp; <strong>Tripulacion:</strong> ${v.crew} per. &nbsp;·&nbsp; <strong>Comb:</strong> $${v.costPerKm}/km &nbsp;·&nbsp; <strong>Desgaste:</strong> $${v.deprPerKm}/km<br>
+        <strong>Min carga:</strong> ${kgS(v.minKg||0)} &nbsp;·&nbsp; <strong>Min ticket:</strong> ${$N(v.minTicket||0)} &nbsp;·&nbsp; <strong>Min flete:</strong> ${$N(v.minFlete||0)}
+      </div>
+    </div>
+    <div class="va">
+      <button class="btn bo bsm" onclick="editVeh('${v.id}')">✏️</button>
+      <button class="btn bsm" style="background:#FEE2E2;color:#991B1B;border:none" onclick="delVeh('${v.id}')">🗑</button>
+    </div>
+  </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+// CONFIG TAB
+// ══════════════════════════════════════════════════════════
+async function saveCfgAndSync(){
+  saveCfg();
+  if(cfg.sheetsUrl&&cfg.sheetsUrl.trim()){
+    shStat('⏳ Guardando en Sheets...','in');
+    const ok=await saveSheets(true);
+    shStat(ok?'✅ Configuracion guardada y sincronizada.':'⚠️ Guardado local · error en Sheets.',ok?'ok':'wa');
+  }else{
+    shStat('✅ Configuracion guardada localmente.','ok');
+  }
+  startAutoRefresh();
+}
+function renderCfg(){
+  const m=document.getElementById('cfg-mar'),w=document.getElementById('cfg-wag'),u=document.getElementById('cfg-url'),s=document.getElementById('cfg-spd'),rf=document.getElementById('cfg-ref');
+  if(m)m.value=cfg.margin;if(w)w.value=cfg.wage;if(u)u.value=cfg.sheetsUrl||'';if(s)s.value=cfg.speed||50;if(rf)rf.value=cfg.refresh||15;
+}
+function saveCfg(){
+  const m=document.getElementById('cfg-mar'),w=document.getElementById('cfg-wag'),u=document.getElementById('cfg-url'),s=document.getElementById('cfg-spd'),rf=document.getElementById('cfg-ref');
+  if(m)cfg.margin=+m.value||40;if(w)cfg.wage=+w.value||150;if(u)cfg.sheetsUrl=u.value.trim();if(s)cfg.speed=+s.value||50;if(rf)cfg.refresh=+rf.value||0;
+  saveLocal();go();startAutoRefresh();
+}
+
+// ══════════════════════════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════════════════════════
+function openMod(html){document.getElementById('modal-box').innerHTML=html;document.getElementById('modal').style.display='flex';}
+function closeMod(){document.getElementById('modal').style.display='none';}
+
+// PRODUCT EDITOR
+function editProd(id){
+  const p=id?prods.find(p=>p.id===id):null;
+  const cts=[...new Set(prods.map(p=>p.cat))];
+  openMod(`<div class="mh"><div class="mt">${p?'Editar producto':'Nuevo producto'}</div><button class="mx" onclick="closeMod()">×</button></div>
+  <form onsubmit="saveProd(event,'${id||''}')">
+    <div class="fg"><label class="fl">Nombre del producto</label><input class="fi" type="text" name="name" value="${p?.name||''}" required placeholder="Ej: Block hueco #10"></div>
+    <div class="fg"><label class="fl">Categoria</label><input class="fi" type="text" name="cat" value="${p?.cat||''}" required list="cl2" placeholder="Block, Cemento, Acero..."><datalist id="cl2">${cts.map(c=>`<option value="${c}">`).join('')}</datalist></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Peso por unidad (kg)</label><input class="fi" type="number" name="kg" value="${p?.kg||''}" required min="0" step="0.01" placeholder="0.0"></div>
+      <div class="fg"><label class="fl">Precio de venta ($)</label><input class="fi" type="number" name="price" value="${p?.price||''}" required min="0" step="0.01" placeholder="0.00"></div>
+    </div>
+    <div class="fg"><label class="fl">Unidad de medida</label><input class="fi" type="text" name="unit" value="${p?.unit||'pieza'}" required placeholder="pieza, saco, rollo, kg, lata..."></div>
+    <div class="bgrp"><button type="submit" class="btn bp">💾 Guardar</button><button type="button" class="btn bo" onclick="closeMod()">Cancelar</button></div>
+  </form>`);
+}
+async function saveProd(e,eid){
+  e.preventDefault();
+  const btn=e.target.querySelector('button[type="submit"]');
+  const orig=btn?btn.innerHTML:'';
+  if(btn){btn.disabled=true;btn.innerHTML='⏳ Guardando...';}
+  const fd=new FormData(e.target);
+  const d={id:eid||uid(),name:fd.get('name').trim(),cat:fd.get('cat').trim(),kg:+fd.get('kg'),price:+fd.get('price'),unit:fd.get('unit').trim()};
+  if(eid){const i=prods.findIndex(p=>p.id===eid);if(i>=0)prods[i]=d;}else prods.push(d);
+  saveLocal();
+  if(cfg.sheetsUrl&&cfg.sheetsUrl.trim()){
+    const ok=await saveSheets(true);
+    if(btn)btn.innerHTML=ok?'✅ Guardado y sincronizado':'⚠️ Guardado local · Sheets falló';
+  }else{if(btn)btn.innerHTML='✅ Guardado';}
+  setTimeout(()=>{closeMod();renderProds();renderCalc();},700);
+}
+async function delProd(id){
+  if(!confirm('¿Eliminar este producto?'))return;
+  prods=prods.filter(p=>p.id!==id);cart=cart.filter(c=>c.id!==id);
+  saveLocal();
+  if(cfg.sheetsUrl&&cfg.sheetsUrl.trim())saveSheets(true);
+  renderProds();renderCalc();
+}
+
+// VEHICLE EDITOR
+function editVeh(id){
+  const v=id?vehs.find(v=>v.id===id):null;
+  openMod(`<div class="mh"><div class="mt">${v?'Editar vehiculo':'Nuevo vehiculo'}</div><button class="mx" onclick="closeMod()">×</button></div>
+  <form onsubmit="saveVeh(event,'${id||''}')">
+    <div class="fr">
+      <div class="fg"><label class="fl">Nombre</label><input class="fi" type="text" name="name" value="${v?.name||''}" required placeholder="Ej: Nissan 1 Ton"></div>
+      <div class="fg"><label class="fl">Icono (emoji)</label><input class="fi" type="text" name="icon" value="${v?.icon||'🚛'}" placeholder="🚛"></div>
+    </div>
+    <div class="fg"><label class="fl">Descripcion breve</label><input class="fi" type="text" name="desc" value="${v?.desc||''}" placeholder="Ej: Cargas medianas"></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Capacidad maxima (kg)</label><input class="fi" type="number" name="maxKg" value="${v?.maxKg||''}" required min="1"></div>
+      <div class="fg"><label class="fl">Tripulacion (personas)</label><input class="fi" type="number" name="crew" value="${v?.crew||2}" required min="1" max="10"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Costo combustible ($/km)</label><input class="fi" type="number" name="costPerKm" value="${v?.costPerKm||''}" required min="0" step="0.5"></div>
+      <div class="fg"><label class="fl">Desgaste vehiculo ($/km)</label><input class="fi" type="number" name="deprPerKm" value="${v?.deprPerKm||''}" required min="0" step="0.1"></div>
+    </div>
+    <hr class="sep">
+    <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;display:block;margin-bottom:10px">Minimos para aceptar entrega</span>
+    <div class="fr3">
+      <div class="fg"><label class="fl">Min carga (kg)</label><input class="fi" type="number" name="minKg" value="${v?.minKg||0}" min="0" step="50"></div>
+      <div class="fg"><label class="fl">Min ticket ($)</label><input class="fi" type="number" name="minTicket" value="${v?.minTicket||0}" min="0" step="500"></div>
+      <div class="fg"><label class="fl">Min flete ($)</label><input class="fi" type="number" name="minFlete" value="${v?.minFlete||0}" min="0" step="50"></div>
+    </div>
+    <div class="bgrp"><button type="submit" class="btn bp">💾 Guardar</button><button type="button" class="btn bo" onclick="closeMod()">Cancelar</button></div>
+  </form>`);
+}
+async function saveVeh(e,eid){
+  e.preventDefault();
+  const btn=e.target.querySelector('button[type="submit"]');
+  const orig=btn?btn.innerHTML:'';
+  if(btn){btn.disabled=true;btn.innerHTML='⏳ Guardando...';}
+  const fd=new FormData(e.target);
+  const exist=eid?vehs.find(v=>v.id===eid):null;
+  const d={id:eid||uid(),name:fd.get('name').trim(),icon:fd.get('icon')||'🚛',desc:fd.get('desc').trim(),
+    maxKg:+fd.get('maxKg'),crew:+fd.get('crew'),costPerKm:+fd.get('costPerKm'),deprPerKm:+fd.get('deprPerKm'),
+    minKg:+fd.get('minKg'),minTicket:+fd.get('minTicket'),minFlete:+fd.get('minFlete'),
+    accent:exist?.accent||'#374151',light:exist?.light||'#F9FAFB',border:exist?.border||'#D1D5DB'};
+  if(eid){const i=vehs.findIndex(v=>v.id===eid);if(i>=0)vehs[i]=d;}else vehs.push(d);
+  saveLocal();
+  if(cfg.sheetsUrl&&cfg.sheetsUrl.trim()){
+    const ok=await saveSheets(true);
+    if(btn)btn.innerHTML=ok?'✅ Guardado y sincronizado':'⚠️ Guardado local · Sheets falló';
+  }else{if(btn)btn.innerHTML='✅ Guardado';}
+  setTimeout(()=>{closeMod();renderVehs();renderCalc();},700);
+}
+async function delVeh(id){
+  if(vehs.length<=1){alert('No puedes eliminar el unico vehiculo.');return;}
+  if(!confirm('¿Eliminar este vehiculo?'))return;
+  vehs=vehs.filter(v=>v.id!==id);
+  if(selV===id)selV=vehs[0].id;
+  saveLocal();
+  if(cfg.sheetsUrl&&cfg.sheetsUrl.trim())saveSheets(true);
+  renderVehs();renderCalc();
+}
+
+// ══════════════════════════════════════════════════════════
+// CART & SELECTION
+// ══════════════════════════════════════════════════════════
+function addCart(){
+  const id=document.getElementById('add-sel').value;
+  const qty=Math.max(1,+document.getElementById('add-qty').value||1);
+  const i=cart.findIndex(c=>c.id===id);
+  if(i>=0)cart[i].qty+=qty;else cart.push({id,qty});
+  go();
+}
+function remCart(i){cart.splice(i,1);go();}
+function updCart(i,q){if(q<=0){remCart(i);return;}cart[i].qty=q;go();}
+function selVeh(id){selV=id;go();}
+
+function setMode(isTime){
+  tMode=isTime;
+  document.getElementById('mode-km').style.display=isTime?'none':'block';
+  document.getElementById('mode-tm').style.display=isTime?'block':'none';
+  document.getElementById('tgl-km').classList.toggle('on',!isTime);
+  document.getElementById('tgl-tm').classList.toggle('on',isTime);
+  go();
+}
+
+function go(){
+  const spd=cfg.speed||50;
+  if(tMode){
+    const h=Math.max(0,+document.getElementById('t-hrs')?.value||0);
+    const m=Math.max(0,+document.getElementById('t-min')?.value||0);
+    const totalH=h+m/60;
+    km=Math.max(1,Math.round(totalH*spd));
+    const estEl=document.getElementById('est-km');
+    const estV=document.getElementById('est-km-val');
+    const estS=document.getElementById('est-spd');
+    const tmI=document.getElementById('tm-info');
+    if(estEl)estEl.style.display=totalH>0?'block':'none';
+    if(estV)estV.textContent=km;
+    if(estS)estS.textContent=spd;
+    if(tmI&&totalH>0)tmI.innerHTML=`Viaje redondo: <strong>${km*2} km estimados</strong>`;
+    else if(tmI)tmI.innerHTML='Ingresa el tiempo de viaje';
+  }else{
+    km=Math.max(1,+document.getElementById('km-val')?.value||25);
+    const ki=document.getElementById('km-info');
+    if(ki)ki.innerHTML=`Viaje redondo: <strong>${km*2} km</strong>`;
+  }
+  renderCart();renderResults();renderSicar();
+  document.querySelectorAll('.vb').forEach((btn,i)=>{
+    const v=vehs[i];if(!v)return;
+    const a=v.id===selV;
+    btn.style.border=a?`2px solid ${v.accent}`:'1.5px solid #E5E7EB';
+    btn.style.background=a?v.light:'#F9FAFB';
+    btn.querySelector('.vb-nm').style.color=a?v.accent:'';
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// SCRIPT COPY
+// ══════════════════════════════════════════════════════════
+function copyCode(){
+  const el=document.getElementById('gs-code');
+  if(el)navigator.clipboard.writeText(el.innerText).then(()=>alert('✅ Codigo copiado.'));
+}
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+loadLocal();
+renderAll();
+// Auto-load from Sheets on open (if URL configured), then start interval
+if(cfg.sheetsUrl&&cfg.sheetsUrl.trim()){
+  silentLoad(); // immediate load on open
+}
+startAutoRefresh(); // start periodic refresh
+</script>
+</body>
+</html>
