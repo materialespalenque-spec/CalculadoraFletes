@@ -287,83 +287,12 @@ input,select,button,textarea{font-family:inherit;font-size:inherit}
     <hr class="sep">
     <div class="cs2">
       <span class="cs2-t">☁️ Sincronización con Google Sheets</span>
-      <p class="msm mu" style="margin-bottom:10px">Conecta un Google Apps Script para cargar y guardar datos desde una hoja de cálculo. Ver instrucciones más abajo.</p>
+      <p class="msm mu" style="margin-bottom:10px">Pega la URL del Apps Script de Google Sheets para sincronizar productos y vehículos entre sucursales.</p>
       <div class="fg"><label class="fl">URL del Apps Script desplegado</label><input class="fi" type="url" id="cfg-url" placeholder="https://script.google.com/macros/s/..." oninput="saveCfg()"></div>
-      <div class="bgrp">
-        <button class="btn bo" onclick="loadSheets()">⬇ Cargar de Sheets</button>
-        <button class="btn bs" onclick="saveSheets()">⬆ Guardar en Sheets</button>
-      </div>
       <div id="sh-status"></div>
     </div>
-    <hr class="sep">
-    <div class="cs2">
-      <span class="cs2-t">💾 Respaldo local</span>
-      <div class="bgrp">
-        <button class="btn bo" onclick="expJSON()">⬇ Exportar JSON</button>
-        <label class="btn bo" style="cursor:pointer">⬆ Importar JSON<input type="file" accept=".json" style="display:none" onchange="impJSON(this)"></label>
-        <button class="btn bd bsm" onclick="resetAll()">↺ Restablecer</button>
-      </div>
-    </div>
+
   </div>
-
-  <div class="card">
-    <span class="cs2-t" style="font-size:13px;font-weight:700;display:block;margin-bottom:10px">📋 Código para Google Apps Script</span>
-    <p class="msm mu" style="margin-bottom:10px">
-      <strong>Pasos:</strong><br>
-      1. Crea un Google Sheets con 3 pestañas: <strong>Productos</strong>, <strong>Vehiculos</strong> y <strong>Config</strong><br>
-      2. Ve a <em>Extensiones → Apps Script</em> y pega el código de abajo<br>
-      3. Haz clic en <em>Implementar → Nueva implementación → Aplicación web</em><br>
-      4. Ejecutar como: <strong>Yo</strong> · Acceso: <strong>Cualquier persona</strong><br>
-      5. Copia la URL y pégala arriba
-    </p>
-    <button class="btn bo bsm" onclick="copyCode()" style="margin-bottom:6px">📋 Copiar código</button>
-    <pre class="code" id="gs-code">// ─── MATERIALES PALENQUE — Google Apps Script ───────────────────────────
-const SH = { p:'Productos', v:'Vehiculos', c:'Config' };
-
-function doGet(e) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  return out({ products:readSheet(ss,SH.p), vehicles:readSheet(ss,SH.v), config:readCfg(ss) });
-}
-
-function doPost(e) {
-  try {
-    const d = JSON.parse(e.postData.contents);
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    if (d.products) writeSheet(ss, SH.p, d.products);
-    if (d.vehicles) writeSheet(ss, SH.v, d.vehicles);
-    if (d.config)   writeCfg(ss, d.config);
-    return out({ok:true});
-  } catch(err){ return out({error:err.toString()}); }
-}
-
-function readSheet(ss,name){
-  const sh=ss.getSheetByName(name); if(!sh) return [];
-  const rows=sh.getDataRange().getValues(); if(rows.length<2) return [];
-  const h=rows[0]; return rows.slice(1).map(r=>{const o={};h.forEach((k,i)=>o[k]=r[i]);return o;});
-}
-
-function writeSheet(ss,name,data){
-  let sh=ss.getSheetByName(name)||ss.insertSheet(name);
-  sh.clearContents(); if(!data.length) return;
-  const h=Object.keys(data[0]); sh.appendRow(h);
-  data.forEach(r=>sh.appendRow(h.map(k=>r[k]??'')));
-}
-
-function readCfg(ss){
-  const sh=ss.getSheetByName(SH.c); if(!sh) return {};
-  const o={}; sh.getDataRange().getValues().forEach(r=>{if(r[0])o[r[0]]=r[1];}); return o;
-}
-
-function writeCfg(ss,cfg){
-  let sh=ss.getSheetByName(SH.c)||ss.insertSheet(SH.c);
-  sh.clearContents(); Object.entries(cfg).forEach(([k,v])=>sh.appendRow([k,v]));
-}
-
-function out(data){
-  return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
-}</pre>
-  </div>
-</div>
 
 </div><!-- end wrap -->
 
@@ -1027,10 +956,7 @@ function go(){
 // ══════════════════════════════════════════════════════════
 // SCRIPT COPY
 // ══════════════════════════════════════════════════════════
-function copyCode(){
-  const el=document.getElementById('gs-code');
-  if(el)navigator.clipboard.writeText(el.innerText).then(()=>alert('✅ Codigo copiado.'));
-}
+
 
 // ══════════════════════════════════════════════════════════
 // INIT
