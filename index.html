@@ -540,8 +540,13 @@ async function loadSheets(){
   }catch(e){shStat('❌ Error: '+e.message+'. Verifica la URL y permisos del Apps Script.','er');}
 }
 async function saveSheets(silent=false){
-  const url=cfg.sheetsUrl.trim();
-  if(!url){shStat('⚠️ Ingresa la URL del Apps Script primero.','wa');return;}
+  const url=(cfg.sheetsUrl||'').trim();
+  if(!url){if(!silent)shStat('⚠️ Ingresa la URL del Apps Script primero.','wa');return false;}
+  // Safety: if no local save timestamp, warn before pushing (avoids overwriting Sheets with defaults)
+  if(!silent&&!localStorage.getItem('mp_ts')){
+    const ok=confirm('⚠️ ADVERTENCIA\n\nNo hay datos guardados localmente en este navegador.\nSi continúas, los datos actuales de Google Sheets serán reemplazados por los valores iniciales del sistema.\n\n¿Estás seguro?');
+    if(!ok)return false;
+  }
   if(!silent)shStat('⏳ Guardando en Google Sheets...','in');
   try{
     const r=await fetch(url,{method:'POST',body:JSON.stringify({products:prods,vehicles:vehs,config:{margin:cfg.margin,wage:cfg.wage,speed:cfg.speed||50}}),redirect:'follow'});
@@ -845,14 +850,13 @@ function renderVehs(){
 // ══════════════════════════════════════════════════════════
 async function saveCfgAndSync(){
   saveCfg();
-  if(cfg.sheetsUrl&&cfg.sheetsUrl.trim()){
-    shStat('⏳ Guardando en Sheets...','in');
-    const ok=await saveSheets(true);
-    shStat(ok?'✅ Configuracion guardada y sincronizada.':'⚠️ Guardado local · error en Sheets.',ok?'ok':'wa');
-  }else{
-    shStat('✅ Configuracion guardada localmente.','ok');
-  }
+  // Config saves LOCAL only — never auto-push to Sheets to avoid overwriting data
+  shStat('✅ Configuracion guardada. Los datos se cargarán desde Sheets en breve.','ok');
   startAutoRefresh();
+  // Immediately pull fresh data from Sheets after saving config
+  if(cfg.sheetsUrl&&cfg.sheetsUrl.trim()){
+    setTimeout(silentLoad, 800);
+  }
 }
 function renderCfg(){
   const m=document.getElementById('cfg-mar'),w=document.getElementById('cfg-wag'),u=document.getElementById('cfg-url'),s=document.getElementById('cfg-spd'),rf=document.getElementById('cfg-ref');
@@ -1032,12 +1036,25 @@ function copyCode(){
 // INIT
 // ══════════════════════════════════════════════════════════
 loadLocal();
-renderAll();
-// Auto-load from Sheets on open (if URL configured), then start interval
-if(cfg.sheetsUrl&&cfg.sheetsUrl.trim()){
-  silentLoad(); // immediate load on open
+// Check if this is a fresh browser with no local data
+const _hasLocalData = !!localStorage.getItem('mp_p');
+if(_hasLocalData){
+  // Has local data — render immediately, then silently refresh from Sheets
+  renderAll();
+  if(cfg.sheetsUrl&&cfg.sheetsUrl.trim()) silentLoad();
+} else {
+  // No local data — try to load from Sheets FIRST before rendering
+  renderAll(); // render defaults while loading
+  if(cfg.sheetsUrl&&cfg.sheetsUrl.trim()){
+    // Show loading notice in header
+    setTimeout(()=>{
+      const el=document.getElementById('save-ind');
+      if(el){el.textContent='⏳ Cargando datos desde Sheets...';el.style.opacity='1';el.style.color='#FDE68A';}
+    },300);
+    silentLoad(); // this will overwrite defaults with Sheets data
+  }
 }
-startAutoRefresh(); // start periodic refresh
+startAutoRefresh();
 </script>
 </body>
 </html>
